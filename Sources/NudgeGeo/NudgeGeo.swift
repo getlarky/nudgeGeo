@@ -8,7 +8,7 @@ import os.log
 
 private let fileName = "NudgeGeo.swift"
 
-@objc public class NudgeGeo : NudgeBase {
+@objc open class NudgeGeo : NudgeBase {
     
     @objc public init(options: Dictionary<String,Any> = [:], callback: (()->Void)? = nil) {
         super.init()
