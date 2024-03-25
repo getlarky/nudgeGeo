@@ -29,6 +29,7 @@ class LocationManagerDelegate: NSObject, CLLocationManagerDelegate {
     ]
     
     static let SharedManager = LocationManagerDelegate ()
+    var logger = CustomLog()
     
     private override init () {
         super.init()
@@ -44,12 +45,12 @@ class LocationManagerDelegate: NSObject, CLLocationManagerDelegate {
             NudgeAnalytics.trackError(error: "iOS version less than 9.0, not supporting location monitoring.", file: fileName, function: "init")
         }
         self.locationManager.pausesLocationUpdatesAutomatically = false
-//        print("------- Location Manager Delegate initialized ------------")
+        logger.infoLocationTracking(message: "------- Location Manager Delegate initialized ------------")
     }
     
     func locationManager(_ manager: CLLocationManager,
                          didChangeAuthorization status: CLAuthorizationStatus) {
-        print("------- Location Manager didChangeAuthorization ------------")
+        logger.debugLocationTracking(message: "------- Location Manager didChangeAuthorization ------------")
         switch status {
             case .restricted, .denied, .authorizedWhenInUse:
                 self.locationManager.stopMonitoringSignificantLocationChanges()
@@ -78,9 +79,11 @@ class LocationManagerDelegate: NSObject, CLLocationManagerDelegate {
     }
     
     public func startMonitoringLocation() {
+        logger.debugLocationTracking(message: "startMonitoringLocation() method called")
         let authorizationStatus = CLLocationManager.authorizationStatus()
         if (authorizationStatus == .restricted || authorizationStatus == .denied) {
             NudgeAnalytics.trackError(error: "Location permissions restricted, not monitoring location", file: fileName, function: "startMonitoringLocation")
+            logger.errorLocationTracking(message: "! Location permissions restricted, not monitoring location")
             if (KeyValueStore.getInt(key: KeyValueStore.howManyTimesPrompted) == 3){
                 return
             }
@@ -107,14 +110,15 @@ class LocationManagerDelegate: NSObject, CLLocationManagerDelegate {
                         let actionOK = UIAlertAction(title: "OK", style: .default) { (action:UIAlertAction) in
                             self.locationManager.requestAlwaysAuthorization()
                         }
-                        
                             
                         alertController.addAction(actionOK)
+                        logger.debugLocationTracking(message: "Present Prominent Disclosure Dialog")
                         alertController.present(animated: true, completion: nil)
                         return
                         
                     }
                 } else {
+                    logger.debugLocationTracking(message: "Requesting Allow Always Location Permission")
                     self.locationManager.requestAlwaysAuthorization()
                     return
                 }
@@ -126,7 +130,7 @@ class LocationManagerDelegate: NSObject, CLLocationManagerDelegate {
         }
         locationManager.startUpdatingLocation()
         locationManager.startMonitoringSignificantLocationChanges()
-        print("------- Start Location Monitoring ------------")
+        logger.infoLocationTracking(message:"------- Start Location Monitoring ------------")
     }
     
     public func stopMonitorinLocation(){
@@ -135,7 +139,7 @@ class LocationManagerDelegate: NSObject, CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager,  didUpdateLocations locations: [CLLocation]) {
-        print("------- Location Update ------------")
+        logger.debugLocationTracking(message:"------- Location Update ------------")
         let lastLocation = locations.last!
         let uncertainty = lastLocation.horizontalAccuracy
         var paramsDict = [String:Any]()
@@ -157,8 +161,10 @@ class LocationManagerDelegate: NSObject, CLLocationManagerDelegate {
             
           //  let url = Constants.Core.url + Constants.Core.Endpoints.actionsByLocationAndDatetime
             let url = EnvironmentUtils.getNudgeURL(service: EnvironmentUtils.Service.CORE.rawValue) + Constants.Core.Endpoints.actionsByLocationAndDatetime
-            print("actionsByLocationAndDatetime url is " + url)
-            print("actionsByLocationAndDatetime postData is " + paramsDict.description)
+           // print("actionsByLocationAndDatetime url is " + url)
+            let text = "actionsByLocationAndDatetime postData is " + paramsDict.description
+            logger.debugLocationTracking(message: text)
+            //print("actionsByLocationAndDatetime postData is " + paramsDict.description)
             
             HttpClientApi.instance().makeAPICall(url: url, params:paramsDict, method: .POST, success: { (data, response, error) in
             }, failure: { (data, response, error) in

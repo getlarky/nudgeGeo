@@ -18,12 +18,11 @@ let package = Package(
         //
         // Using 'path', we can depend on a local package that's
         // located at a given path relative to our package's folder:
-        //.package(path: "../nudgeBase"),
+//        .package(path: "../nudgeBase"),
         .package(
-        //  name: "nudgeBase",
-            url: "git@github.com:getlarky/nudgeBase.git",
-            .upToNextMajor(from: "1.0.0")
-        ),
+            url: "https://github.com/getlarky/nudgeBase.git",
+            .upToNextMajor(from: "1.2.1")
+        )
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.

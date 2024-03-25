@@ -8,7 +8,8 @@ import os.log
 
 private let fileName = "NudgeGeo.swift"
 
-@objc open class NudgeGeo : NudgeBase {
+@objc public class NudgeGeo : NudgeBase {
+    var logger = CustomLog()
     
     @objc public init(options: Dictionary<String,Any> = [:], callback: (()->Void)? = nil) {
         super.init()
@@ -73,7 +74,8 @@ private let fileName = "NudgeGeo.swift"
     }
     
     func initializeNudgeSuccess(newDeviceId: String, callback: (()->Void)? = nil) -> Void {
-        print("=======================NUDGEGEO=======================")
+        logger.infoNudgeInit(message:"=======================NUDGEGEO=======================")
+        //print("=======================NUDGEGEO=======================")
      //   let deviceId = KeyValueStore.getString(key: KeyValueStore.deviceId)
         NudgeAnalytics.setupAnalytics()
         NudgeAnalytics.track(eventName: NudgeAnalytics.INTIALIZE_NUDGE, data: [:])
