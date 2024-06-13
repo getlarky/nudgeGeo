@@ -21,7 +21,7 @@ let package = Package(
 //        .package(path: "../nudgeBase"),
         .package(
             url: "https://github.com/getlarky/nudgeBase.git",
-            .upToNextMajor(from: "1.2.1")
+            .upToNextMajor(from: "1.2.2")
         )
     ],
     targets: [
